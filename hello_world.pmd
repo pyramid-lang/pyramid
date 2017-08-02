@@ -1,0 +1,92 @@
+/*
+nearleyc grammar.ne > grammar.js;nearley-test grammar.js --quiet < test_input.pmd
+*/
+/*
+ * This is a block comment and can span several lines.
+ * Here is the 2nd line, for demonstration purposes.
+ */
+
+/**
+ * This is a doc-string...
+ */
+if true { //this is a comment
+
+}
+
+
+//all valid types
+var yes:bool = true
+var no:bool = false
+
+var min_unsigned_int:u32 = 0
+var max_unsigned_int:u32 = 4294967295
+var min_signed_int:i32 = -2147483648
+var max_signed_int:i32 = 2147483647
+
+var float_32:f32 = 3.141592653589
+var float_64:f64 = -0.5
+
+var test = 5 * 6 / 7
+//Type annotations are optional
+var a_bool_var = true
+
+var mailbox_empty = true
+var is_raining = true
+
+var should_get_mail = mailbox_empty and not is_raining
+var favorite_number = 42
+
+if should_get_mail {
+
+}else if favorite_number == 7 {
+
+} else {
+
+}
+
+while num == 7{
+
+}
+
+
+func asdf(a1:u32 ,b,c,d,e){
+  return 17
+}
+
+/* Potential future features */
+/********************************************
+var alice = Person{age: 7, name: "Alice"}
+var bob = Person::new(age: 7, name: "Bob")
+var bob_age = bob.get_age()
+
+
+class Person{
+  age: u32
+  name: string
+  description: string?
+
+  public static new(age: u32, : u32):Self{
+
+  }
+
+  public get_age(){
+    self.age
+  }
+}
+
+trait Meta{
+
+}
+
+impl Meta for Person{
+
+}
+
+
+default Person{
+  age: 3
+  name: "Chris"
+}
+
+var chris_age = Person.get_age()
+var chris = Person::default
