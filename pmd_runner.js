@@ -1,45 +1,33 @@
+/*
+pegjs grammar.pegjs>grammar.js ; cat test_input.pmd | node pmd_runner.js
+*/
+
 let grammar = require('./grammar.js');
 let binaryen = require('binaryen');
 let fs = require('fs');
+let Parser = require('./ast_parser/ast_parser.js');
 
 let outputFile = "hello_world.wasm";
 
 require('get-stdin')().then((str)=>{
   let ast = grammar.parse(str);
-  let module = generateWasmModule(ast);
-  let binary = module.emitBinary();
-  runWasm(binary);
-  // fs.writeFile(outputFile, new Buffer(binary), 'binary', function(err){
-  //   if(err){
-  //     console.log("Error:", err);
-  //   }else{
-  //     console.log("DONE");
-  //   }
-  // });
+  let module = Parser.parse(ast);
+  let wasmModule = module.compile();
+  // console.log("Module:", module);
+  // let wasmModule = generateWasmModule(ast);
+  let binary = wasmModule.emitBinary();
+
+  fs.writeFile(outputFile, new Buffer(binary), 'binary', function(err){
+    if(err){
+      console.log("Error writing WASM file:", err);
+    }else{
+      console.log("Wrote WASM file to disk");
+      runWasm(binary);
+    }
+  });
 }).catch(err=>{
-  console.log("Err:", err);
+  console.log(err);
 });
-
-function generateWasmModule(ast){
-  let mod = new binaryen.Module();
-  for(let i=0; i<ast.length; i++){
-    let info = ast[i];
-    addFunction(mod, info);
-  }
-  return mod;
-}
-
-function addFunction(mod, info){
-  console.log("Add function:", info);
-  let name = info.name;
-
-  let funcType = mod.addFunctionType(name, binaryen.i32, []);
-  let func = mod.addFunction(name, funcType, [], [
-    mod.return(mod.i32.const(1234)),
-  ]);
-  mod.addExport(name, name);
-  console.log("funcType:", funcType);
-}
 
 function runWasm(binary){
   let imports = {};
@@ -47,11 +35,12 @@ function runWasm(binary){
     let instance = result.instance;
     let mainFunc = instance.exports.main;
     if(mainFunc){
-      mainFunc();
-      console.log("Finished running.");
+      let ret = mainFunc();
+      console.log("Finished running: ", ret);
     }else{
       console.log("No 'main' function found");
     }
+  }).catch(err=>{
+    console.log(err);
   });
-
 }

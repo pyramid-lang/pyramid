@@ -17,10 +17,17 @@
 
 
 /*debug = output:start {return JSON.stringify(output, null, 2);}*/
-start = _* x1:function HS* x2:(VS HS* x:function {return x})* _* {return [x1].concat(x2)}
+start = functionList?
+
+importList = _* x1:import HS* x2:(VS1 x:import {return x})* _* {return [x1].concat(x2)}
+
+import = "import" _+ importName
+
+functionList = _* x1:function HS* x2:(VS1 x:function {return x})* _* {return [x1].concat(x2)}
 
 function = "func" _+ name:funcName _* "(" _* params:funcParams _* ")" _* "{" _* body:funcBody _* "}" {
   return {
+    type: "function",
     name: name,
     params: params,
     body: body
@@ -32,9 +39,9 @@ funcBody = _* x1:statement? HS* x2:(VS HS* x:statement {return x})* _* {return c
 
 statement = x:statementReturn
 
-statementReturn = "return" _+ expr:expr {
+statementReturn = "return" _+ expr:expr? {
   return {
-    type: "Return",
+    statementType: "return",
     value: expr
   }
 }
@@ -44,23 +51,36 @@ statementDeclareVariable = "var" _+ name:varName _* "=" _* expr:expr
 expr = exprAtom
 
 /*exprBool = exprAtom _* opBool _* exprBool / exprAtom*/
-exprAtom = x:constantInteger {
+exprAtom = (constantBoolean / constantU32)
+
+constantBoolean = x:("true" / "false"){
   return {
-    type: "ConstantInteger",
-    value: x
+    expressionType: "constant",
+    constantType: "bool",
+    value: x == "true"
   }
 }
 
-constantInteger = $("-"? [0-9]+)
+constantU32 = x:$([0-9]+){
+  return {
+    expressionType: "constant",
+    constantType: "u32",
+    value: parseInt(x)
+  }
+}
 
 opBool = "|" / "&"
 opCompare = "<" / ">"/ "<="/ ">="/ "=="/ "!="
 opSum = "+"/ "-"
 opMul = "*"/ "/"/ "%"
 
+primitiveType = "bool"
+
+importName = $(varName)
 funcName = $(varName)
 varName = $([a-z]*)
 
+VS1 = HS* VS+ _*
 HS = ' ' / '\t'
 VS = '\r' / '\n'
 _ = HS / VS
