@@ -1,3 +1,4 @@
 func main(){
-  return true
+  let foo = 14
+  return 3
 }

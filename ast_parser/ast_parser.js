@@ -39,6 +39,10 @@ class AstParser{
   static parseStatement(ast){
     if(ast.statementType == 'return'){
       return new code.Return(AstParser.parseExpression(ast.value));
+    }else if(ast.statementType == 'let'){
+      return new code.Let(ast.varName, AstParser.parseExpression(ast.value));
+    }else{
+      throw new Error("Unknown statement: " + JSON.stringify(ast, null, 3));
     }
   }
   static parseExpression(ast){

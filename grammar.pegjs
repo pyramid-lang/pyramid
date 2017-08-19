@@ -37,7 +37,7 @@ function = "func" _+ name:funcName _* "(" _* params:funcParams _* ")" _* "{" _* 
 funcParams = ""
 funcBody = _* x1:statement? HS* x2:(VS HS* x:statement {return x})* _* {return concat(x1, x2)}
 
-statement = x:statementReturn
+statement = (statementReturn / statementDeclareVariable)
 
 statementReturn = "return" _+ expr:expr? {
   return {
@@ -46,12 +46,18 @@ statementReturn = "return" _+ expr:expr? {
   }
 }
 
-statementDeclareVariable = "var" _+ name:varName _* "=" _* expr:expr
+statementDeclareVariable = "let" _+ name:varName _* "=" _* expr:expr {
+  return {
+    statementType: "let",
+    varName: name,
+    value: expr
+  }
+}
 
 expr = exprAtom
 
 /*exprBool = exprAtom _* opBool _* exprBool / exprAtom*/
-exprAtom = (constantBoolean / constantU32)
+exprAtom = constantBoolean / constantU32
 
 constantBoolean = x:("true" / "false"){
   return {

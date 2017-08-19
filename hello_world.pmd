@@ -15,26 +15,29 @@ if true { //this is a comment
 
 
 //all valid types
-var yes:bool = true
-var no:bool = false
+let no = false
 
-var min_unsigned_int:u32 = 0
-var max_unsigned_int:u32 = 4294967295
-var min_signed_int:i32 = -2147483648
-var max_signed_int:i32 = 2147483647
+let (a, b) = (3, 5)
+let (a:u32, b:u8) = (3,5)
 
-var float_32:f32 = 3.141592653589
-var float_64:f64 = -0.5
 
-var test = 5 * 6 / 7
+u32 min_unsigned_int = 0
+u32 max_unsigned_int = 4294967295
+i32 min_signed_int = -2147483648
+i32 max_signed_int = 2147483647
+
+f32 float_32 = 3.141592653589
+f64 float_64 = -0.5
+
+let test = 5 * 6 / 7
 //Type annotations are optional
-var a_bool_var = true
+let a_bool_var = true
 
-var mailbox_empty = true
-var is_raining = true
+let mailbox_empty = true
+let is_raining = true
 
-var should_get_mail = mailbox_empty and not is_raining
-var favorite_number = 42
+let should_get_mail = mailbox_empty & not is_raining
+let favorite_number = 42
 
 if should_get_mail {
 
@@ -44,9 +47,32 @@ if should_get_mail {
 
 }
 
-while num == 7{
+while num == 7 & is_raining {
 
 }
+
+
+asdf(bool a, string b, u32 c){
+  return 17
+}
+
+
+asdf(true, "msg", 3)
+
+asdf(a: true, b: "msg", c: 3)
+
+asdf(
+  a: true,
+  b: "msg",
+  c: 3
+)
+
+
+
+
+
+
+
 
 
 func asdf(a1:u32 ,b,c,d,e){
