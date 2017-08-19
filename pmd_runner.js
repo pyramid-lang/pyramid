@@ -5,13 +5,13 @@ pegjs grammar.pegjs>grammar.js ; cat test_input.pmd | node pmd_runner.js
 let grammar = require('./grammar.js');
 let binaryen = require('binaryen');
 let fs = require('fs');
-let Parser = require('./ast_parser/ast_parser.js');
+let Module = require('./model/module.js');
 
 let outputFile = "hello_world.wasm";
 
 require('get-stdin')().then((str)=>{
   let ast = grammar.parse(str);
-  let module = Parser.parse(ast);
+  let module = Module.parseAst(ast);
   let wasmModule = module.compile();
   // console.log("Module:", module);
   // let wasmModule = generateWasmModule(ast);

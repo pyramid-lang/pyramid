@@ -57,7 +57,7 @@ statementDeclareVariable = "let" _+ name:varName _* "=" _* expr:expr {
 expr = exprAtom
 
 /*exprBool = exprAtom _* opBool _* exprBool / exprAtom*/
-exprAtom = constantBoolean / constantU32
+exprAtom = constantBoolean / constantU32 / exprVarName
 
 constantBoolean = x:("true" / "false"){
   return {
@@ -72,6 +72,13 @@ constantU32 = x:$([0-9]+){
     expressionType: "constant",
     constantType: "u32",
     value: parseInt(x)
+  }
+}
+
+exprVarName = name:varName {
+  return {
+    expressionType: "variable",
+    name: name
   }
 }
 

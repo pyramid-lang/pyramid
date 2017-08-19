@@ -1,4 +1,5 @@
 func main(){
   let foo = 14
-  return 3
+  let bar = 13
+  return bar
 }

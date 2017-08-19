@@ -3,7 +3,7 @@ let type = require("./type");
 
 /* STATEMENTS */
 
-module.exports.Return = class{
+class Return{
   constructor(value){
     this.value = value;
   }
@@ -26,15 +26,17 @@ module.exports.Return = class{
   }
 }
 
-module.exports.Let = class{
-  constructor(name, expr){
+class Let{
+  constructor(name, expr, context){
     this.name = name;
     this.expr = expr;
+    this.context = context;
+    this.context.addVar(this.name, this.expr.getType())
   }
   compile(mod, context){
-    let index = context.addVar(this.name, this.expr.getType())
+    let index = this.context.getVarByName(this.name).index;
     return mod.setLocal(index, this.expr.compile(mod, context));
-    // throw new Error("not implemented");
+    //throw new Error("not implemented");
     //setLocal(index, value)
 
   }
@@ -49,7 +51,7 @@ module.exports.Let = class{
 
 /* EXPRESSIONS */
 
-module.exports.Constant = class{
+class Constant{
   constructor(type, value){
     this.type = type;
     this.value = value;
@@ -77,9 +79,25 @@ module.exports.Constant = class{
   }
 }
 
+ class Variable{
+  constructor(name, context){
+    this.name = name;
+    this.context = context;
+  }
+  compile(mod){
+    let info = this.context.getVarByName(this.name);
+    console.log("Compile var info:", info);
+    return mod.getLocal(info.index, info.type.getWasmType());
+  }
+  getType(){
+    return this.context.getVarByName(this.name).type;
+  }
+  getFunctionReturnType(){
+    return this.getType();
+  }
+}
 
-
-module.exports.Block = class{
+class Block{
   constructor(children){
     this.children = children;
   }
@@ -113,3 +131,52 @@ module.exports.Block = class{
     return return_type;
   }
 }
+
+function parseAst(ast, context){
+    if(ast.length > 1){
+      let parsedChildren = [];
+      ast.forEach((line)=>{
+        parsedChildren.push(parseStatement(line, context));
+      });
+      return new Block(parsedChildren);
+    }else if(ast.length == 1){
+      let line = ast[0];
+      return parseStatement(line, context);
+      console.log("code ast:", line);
+    }else{
+      return null;
+    }
+}
+
+function parseStatement(ast, context){
+  if(ast.statementType == 'return'){
+    return new Return(parseExpression(ast.value, context));
+  }else if(ast.statementType == 'let'){
+    let expr = parseExpression(ast.value, context);
+    return new Let(ast.varName, expr, context);
+  }else{
+    throw new Error("Unknown statement: " + JSON.stringify(ast, null, 3));
+  }
+}
+
+function parseExpression(ast, context){
+  if(!ast){
+    return null;
+  }
+  if(ast.expressionType == "constant"){
+    return new Constant(ast.constantType, ast.value);
+  }else if(ast.expressionType == "variable"){
+    return new Variable(ast.name, context);
+  }else{
+    throw new Error("Unknown ast expression: " + JSON.stringify(ast));
+  }
+}
+
+module.exports = {
+  parseAst: parseAst,
+  Let: Let,
+  Block: Block,
+  Variable: Variable,
+  Constant: Constant,
+  Return: Return
+};

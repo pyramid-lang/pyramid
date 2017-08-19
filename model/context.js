@@ -21,7 +21,7 @@ class Context{
   getVarByName(name){
     for(let a=0; a<this.localVars.length; a++){
       let localVar = this.getVarByIndex(a);
-      if(localVars.name == name){
+      if(localVar.name == name){
         return {
           name: name,
           type: localVar.type,

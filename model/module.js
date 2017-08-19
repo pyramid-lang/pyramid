@@ -1,4 +1,5 @@
 let binaryen = require('binaryen');
+let Function = require('./function')
 
 class Module{
   constructor(){
@@ -23,6 +24,20 @@ class Module{
     });
 
     return wasmMod;
+  }
+  static parseAst(ast){
+    let mod = new Module();
+
+    for(let a=0; a<ast.length; a++){
+      let node = ast[a];
+      if(node.type == "function"){
+        let func = Function.parseAst(node, mod);
+        mod.addFunction(func);
+      }else{
+        console.log("unknown ast in module:", node);
+      }
+    }
+    return mod;
   }
 }
 
